@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 build/
+Wallet_OZARZE8P1JOTCP4N/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
