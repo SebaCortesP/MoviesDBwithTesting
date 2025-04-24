@@ -2,6 +2,7 @@ package com.moviesdb.moviesapp.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,46 +10,48 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.moviesdb.moviesapp.models.Movie;
 import com.moviesdb.moviesapp.repositories.MovieRepository;
-import com.moviesdb.moviesapp.services.MovieService;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class MovieRepositoryTest {
-
-    @Mock
+    @Autowired
     private MovieRepository movieRepository;
 
-    @InjectMocks
-    private MovieService movieService;
+    @Test
+    void storeMovieTest() {
+        Movie m1 = new Movie(); 
+        m1.setTitle("Titanic");
+        m1.setDirector("Seba Cortes");
+        m1.setYear(1992);
+        m1.setGenre("Terror");
+        Movie result = movieRepository.save(m1);
+        assertNotNull(result.getId());
+        assertEquals("Titanic", result.getTitle());
+    }
 
     @Test
-    void testGetAllMovies() {
-        Movie m1 = new Movie(); m1.setTitle("Titanic");
-        Movie m2 = new Movie(); m2.setTitle("Matrix");
+    void getMovieByIdTest(){
+        Movie m1 = new Movie(); 
+        m1.setTitle("Titanic");
+        m1.setDirector("Seba Cortes");
+        m1.setYear(1992);
+        m1.setGenre("Terror");
+        Movie result = movieRepository.save(m1);
+        var foundMovie = movieRepository.findById(result.getId());
 
-        when(movieRepository.findAll()).thenReturn(Arrays.asList(m1, m2));
-
-        List<Movie> movies = movieService.getAllMovies();
-
-        assertEquals(2, movies.size());
-        verify(movieRepository, times(1)).findAll();
+        assertTrue(foundMovie.isPresent(), "La película debería existir");
+        assertEquals(1992, foundMovie.get().getYear(), "El año no coincide");
+        assertEquals("Titanic", foundMovie.get().getTitle(), "El título no coincide");
     }
 }

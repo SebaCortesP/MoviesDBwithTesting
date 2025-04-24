@@ -1,27 +1,33 @@
 package com.moviesdb.moviesapp.models;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
-@NoArgsConstructor
+
 @AllArgsConstructor
 @Entity
+@Getter
+@Setter
 @Table(name = "movies")
 public class Movie {    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     // @Column(name = "id")
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
+    @NotBlank(message = "Title is required")
     private String title;
     @Column(name = "description")
     private String description;
-    @Column(name = "year")
+    @Column(name = "\"year\"")  
     private Integer year;
     @Column(name = "director")
     private String director;
@@ -39,67 +45,7 @@ public class Movie {
         this.synopsis = synopsis;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    // Getter y Setter para 'description'
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    // Getter y Setter para 'director'
-    public String getDirector() {
-        return director;
-    }
-
-    public void setDirector(String director) {
-        this.director = director;
-    }
-
-    // Getter y Setter para 'genre'
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    // Getter y Setter para 'synopsis'
-    public String getSynopsis() {
-        return synopsis;
-    }
-
-    public void setSynopsis(String synopsis) {
-        this.synopsis = synopsis;
-    }
-
-    // Getter y Setter para 'title'
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    // Getter y Setter para 'year'
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
+    public Movie() {}
 
     @Override
     public String toString() {

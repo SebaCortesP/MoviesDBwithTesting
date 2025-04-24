@@ -4,6 +4,8 @@ import org.springframework.web.bind.annotation.*;
 import com.moviesdb.moviesapp.models.Movie;
 import com.moviesdb.moviesapp.services.MovieService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import java.util.List;
@@ -22,23 +24,24 @@ public class MovieController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getMovieById(@PathVariable Long id) {
+    public ResponseEntity<?> getMovieById(@PathVariable("id") Long id) {
         Optional<Movie> movie = movieService.getMovieById(id);
 
         if (movie.isPresent()) {
             return ResponseEntity.ok(movie.get());
+            
         } else {
             return ResponseEntity.status(404).body("Movie with ID " + id + " not found"); 
         }
     }
 
     @PostMapping("/store")
-    public Optional<Movie> storeMovie(@RequestBody Movie movie) {
+    public Optional<Movie> storeMovie(@Valid @RequestBody Movie movie) {
         return movieService.storeMovie(movie);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMovie(@PathVariable Long id, @RequestBody Movie movie) {
+    public ResponseEntity<?> updateMovie(@PathVariable("id") Long id, @RequestBody Movie movie) {
         Optional<Movie> updated = movieService.updateMovie(id, movie);
 
         if (updated.isPresent()) {
