@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 // import org.springframework.test.web.servlet.assertj.MockMvcTester.MockMvcRequestBuilder;
@@ -64,10 +65,11 @@ public class MovieControllerTest {
         // act & assert
         mockMvc.perform(MockMvcRequestBuilders.get("/movies"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title", Matchers.is("Che copete")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title", Matchers.is("Condorito")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[2].title", Matchers.is("Taxi para 3")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.movieList", Matchers.hasSize(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.movieList[0].title", Matchers.is("Che copete")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$._embedded.movieList[1].title", Matchers.is("Condorito")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$._embedded.movieList[2].title", Matchers.is("Taxi para 3")));
     }
 
     @Test
@@ -84,25 +86,30 @@ public class MovieControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title", Matchers.is(movie.getTitle())));
     }
 
-    @WithMockUser
     @Test
-    public void testStoreMovie() throws Exception {
-        // Arrange
-        Movie movie = new Movie();
-        movie.setTitle("La Nana");
+    public void storeMovieTest() throws Exception {
+        // arrange
+        Movie movieToSave = new Movie();
+        movieToSave.setTitle("Nuevo título");
+        movieToSave.setDirector("Nuevo director");
 
-        // Convertir el objeto movie a JSON usando ObjectMapper
-        ObjectMapper objectMapper = new ObjectMapper();
-        String movieJson = objectMapper.writeValueAsString(movie);
+        Movie savedMovie = new Movie();
+        savedMovie.setId(1L);
+        savedMovie.setTitle("Nuevo título");
+        savedMovie.setDirector("Nuevo director");
 
-        when(movieServiceMock.storeMovie(any(Movie.class))).thenReturn(Optional.of(movie));
+        when(movieServiceMock.storeMovie(any(Movie.class))).thenReturn(Optional.of(savedMovie));
 
-        // Act + Assert
+        // act & assert
         mockMvc.perform(MockMvcRequestBuilders.post("/movies/store")
-                .contentType("application/json")
-                .content(movieJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("La Nana"));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(new ObjectMapper().writeValueAsString(movieToSave)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.containsString("/movies/1")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Nuevo título"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.director").value("Nuevo director"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$._links.self.href").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$._links.all-movies.href").exists());
     }
 
 }

@@ -3,6 +3,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +20,7 @@ import jakarta.validation.constraints.NotBlank;
 @Getter
 @Setter
 @Table(name = "movies")
-public class Movie {    
+public class Movie extends RepresentationModel<Movie>{    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
